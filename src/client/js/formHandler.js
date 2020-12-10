@@ -1,12 +1,16 @@
 const handleSubmit = async(event) => {
     event.preventDefault()
-    // check what text was put into the form field
     let formText = document.getElementById('name').value
     let submitButton = document.getElementById('submit-button')
     formText = {
         txt: formText
     }
-    Client.checkForName(formText)
+    // check whether the text area is empty
+
+    if (!Client.isValidText(formText.txt)) {
+        return
+    }
+    
     console.log("::: Form Submitted :::")
     submitButton.disabled = true
 
