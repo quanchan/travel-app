@@ -29,8 +29,10 @@ const handleSubmit = async(event) => {
         console.log('This is the response we received: ', response)
         document.getElementById('results').innerHTML = JSON.stringify(response)
         submitButton.disabled = false
+        return true
     } catch(err) {
         console.log("Something is wrong in handleSubmit: ", err)
+        return false
     }
 }
 
