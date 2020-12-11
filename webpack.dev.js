@@ -8,7 +8,7 @@ module.exports = {
     entry: './src/client/index.js',
     output: {
         libraryTarget: 'var',
-        library: 'Client'
+        library: 'ClientU'
     },
     mode: 'development',
     devtool: 'source-map',

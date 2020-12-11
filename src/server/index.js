@@ -11,35 +11,28 @@ const { url } = require('inspector')
 dotenv.config()
 const app = express()
 // Global variables
-const PORT = 8080
-const BASE_URL = `https://api.meaningcloud.com/sentiment-2.1`
-let toClientData = {}
-
+const PORT = 8081
+const BASE_URL_WEATHER_BIT = `https://api.meaningcloud.com/sentiment-2.1`
+const BASE_URL_PIXABAY = `https://pixabay.com/api/`
+const BASE_URL_GEONAMES = `http://api.geonames.org/postalCodeSearchJSON?`
 
 // Helper functions
-
-let requestMeaningCloud = async (data) => {
-    let url=`${BASE_URL}?key=${process.env.API_KEY}&lang=en&txt=${encodeURI(data)}`
+fetchGeonames = async(location) => {
+    // http://api.geonames.org/postalCodeSearch?placename=&username=quantran12&maxRows=1
     try {
-        let response = await fetch(url, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-
-        })
-        let apiData = await response.json()
-        console.log('api data: ', apiData)
-        toClientData.agreement = apiData.agreement
-        toClientData.subjectivity = apiData.subjectivity
-        toClientData.irony = apiData.irony
-        toClientData.text = apiData.sentence_list[0].text
-        return toClientData
-    } catch(err) {
-        console.log("Something is wrong in requestMeaningCload: ", err)
+        let url = `${BASE_URL_GEONAMES}placename=${location}&username=${process.env.GEONAMES_USER_NAME}&maxRows=1` 
+        let response = await fetch(url)
+        data = await response.json()
+        console.log(data)
+        let {lat, lng} = data.postalCodes[0]
+        console.log("lat", lat)
+        console.log("lng", lng)
+        let coord = {lat, lng}
+        return coord 
+    } catch (err) {
+        console.log("Something is wrong in fetchGeonames",err)
     }
-} 
+}
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -50,30 +43,42 @@ app.use(cors())
 app.use(express.static('dist'))
 
 app.get('/', function (req, res) {
-    // res.sendFile('dist/index.html')
     res.sendFile(path.resolve('src/client/views/index.html'))
 })
 
-app.get('/processed-text', (req, res) => {
-    console.log("Data will be sent to client: ", toClientData)
-    res.send(toClientData)
+
+app.post('/today-forecast', (req, res) => {
+    let data = req.body
+    // (async() => {
+    //     try {
+    //         let toClientData = await requestMeaningCloud(textData)
+    //         console.log(toClientData)
+    //         res.send()
+    //     }
+    //     catch(err) {
+    //         console.log(err)
+    //     }
+    // })()
+    
 })
 
-app.post('/process-text', (req, res) => {
+app.post('/predicted-forecast', (req, res) => {
     let data = req.body
-    let textData = data.txt
-    console.log('Text data: ', textData);
+})
+
+app.post('/get-coord', (req, res) => {
+    let data = req.body
+    let location = data.location
+    console.log("Location received", location);
     (async() => {
         try {
-            let toClientData = await requestMeaningCloud(textData)
-            console.log(toClientData)
-            res.send()
+            let coord = await fetchGeonames(location)
+            res.send(coord)
         }
         catch(err) {
             console.log(err)
         }
     })()
-    
 })
 // designates what port the app will listen to for incoming requests
 app.listen(PORT, () => {
