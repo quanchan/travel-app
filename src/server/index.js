@@ -13,7 +13,7 @@ dotenv.config()
 const app = express()
 // Global variables
 const PORT = 8081
-const BASE_URL_WEATHER_BIT = `https://api.meaningcloud.com/sentiment-2.1`
+const BASE_URL_WEATHER_BIT = `https://api.weatherbit.io/v2.0/forecast/daily?`
 const BASE_URL_PIXABAY = `https://pixabay.com/api/?`
 const BASE_URL_GEONAMES = `http://api.geonames.org/postalCodeSearchJSON?`
 
@@ -46,7 +46,6 @@ const processDate = async (date, coord) => {
 const fetchGeonames = async(location) => {
     try {
         let url = `${BASE_URL_GEONAMES}placename=${encodeURI(location)}&username=${process.env.GEONAMES_USER_NAME}&maxRows=1`
-        console.log("geo url", url) 
         let response = await fetch(url)
         let data = await response.json()
         let {lat, lng} = data.postalCodes[0]
@@ -59,10 +58,10 @@ const fetchGeonames = async(location) => {
 
 const fetchWeatherBit = async(coord, dayToGet) => {
     try {
-        let url = `${BASE_URL_WEATHER_BIT}&lat=${coord.lat}lon=${coord.lng}&days=${dayToGet}`
+        let url = `${BASE_URL_WEATHER_BIT}&lat=${coord.lat}&lon=${coord.lng}&days=${dayToGet}&key=${process.env.WEATHER_BIT_API_KEY}`
         let response = await fetch(url)
         let data = await response.json()
-        console.log("Data: ", data)
+        // console.log("Data: ", data.data[data.data.length - 1])
         return data.data[data.data.length - 1]
     } catch (err) {
         console.log("Something is wrong in fetchWeatherBit", err)
@@ -75,6 +74,7 @@ const fetchPixabay = async(location) => {
         let response = await fetch(url)
         let data = await response.json()
         let picSrc = data.hits[0].webformatURL
+        console.log("picSrc: ", picSrc)
         return picSrc
     } catch (err) {
         console.log("Something is wrong in fetchPixabay", err)
