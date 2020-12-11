@@ -4,9 +4,7 @@ const handleSubmit = async(event) => {
     const date = document.querySelector('#leaving-date').value
     // console.log("Date: ",date)
     // console.log("Destination", destination)
-    
-    let coord = await ClientU.getCoord(location)
-    console.log(coord)
-    ClientU.processDate(date)
+    let travelInfo = await ClientU.getTravelInfo(location, date)
+    console.log(travelInfo)
 }
 export { handleSubmit }
