@@ -74,7 +74,6 @@ const fetchPixabay = async(location) => {
         let response = await fetch(url)
         let data = await response.json()
         let picSrc = data.hits[0].webformatURL
-        console.log("picSrc: ", picSrc)
         return picSrc
     } catch (err) {
         console.log("Something is wrong in fetchPixabay", err)
@@ -102,11 +101,15 @@ app.post('/get-travel-info', (req, res) => {
     let date = data.date
     console.log("Location received", location);
     console.log("Date received", date);
-    //TODO: Write a Promise.AllSettled to make thing go fast
+    //TODO: Fix Promise All
     let promises = [fetchPixabay(location), getCoordThenWeather(location, date)]
-    let toClientData = Promise.all(promises)
-    toClientData = JSON.toClientData
-    res.send(toClientData)
+    Promise.all(promises)
+    .then(toClientData => {
+        console.log("toClientData", toClientData)
+        return JSON.stringify(toClientData)
+    })
+    .then((toClientData) => {res.send(toClientData)})
+    
 })
 // designates what port the app will listen to for incoming requests
 app.listen(PORT, () => {
