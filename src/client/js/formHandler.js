@@ -5,6 +5,7 @@ const handleSubmit = async(event) => {
     // console.log("Date: ",date)
     // console.log("Destination", destination)
     let travelInfo = await ClientU.getTravelInfo(location, date)
-    console.log("Travel Info", travelInfo)
+    // console.log("Travel Info", travelInfo)
+    ClientU.renderUI(travelInfo, date)
 }
 export { handleSubmit }
