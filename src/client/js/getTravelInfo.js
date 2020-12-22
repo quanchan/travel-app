@@ -14,4 +14,4 @@ const getTravelInfo = async(location, date) => {
         console.log("Something went wrong getting Travel Info: ", err)
     }
 }
-export { getTravelInfo } 
+export { getTravelInfo }  
