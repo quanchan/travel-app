@@ -2,16 +2,21 @@
 Travel Info App
 
 # Installation and Setup
-1st: Install all dependency
+1st: Install all dependency:
+```bash
     npm install
+```
 
-2nd: Build the dist file using webpack
+2nd: Build the dist file using webpack:
+```bash
     npm run build-prod
-  
-3rd: Run the project
-    npm start
+```
 
-4th: Open the project on browser
+3rd: Run the project:
+```bash
+    npm start
+```
+4th: Open the project on browser:
     http://localhost:8081
 
 # Description
