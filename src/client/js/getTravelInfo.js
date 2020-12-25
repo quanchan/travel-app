@@ -1,4 +1,5 @@
 const getTravelInfo = async(location, date) => {
+    console.log(typeof date) 
     try {
         let response = await fetch("/get-travel-info", {
             method: 'POST',

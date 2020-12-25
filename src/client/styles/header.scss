@@ -1,5 +1,9 @@
 header {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    background-color: #092950 ;
+    color: white;
     display: flex;
     justify-content: space-between;
     padding: 10px 40px;
+    z-index: 1000;
 }
