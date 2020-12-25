@@ -17,6 +17,7 @@ const BASE_URL_PIXABAY = `https://pixabay.com/api/?`
 const BASE_URL_GEONAMES = `http://api.geonames.org/postalCodeSearchJSON?`
 
 // Helper functions
+// Get the coordinate from Geonames then use that coordinate to get weather data from Weatherbit
 const getCoordThenWeather = async (location, date) => { 
     try {
         let coord = await fetchGeonames(location)
@@ -27,7 +28,7 @@ const getCoordThenWeather = async (location, date) => {
         console.log(err)
     }
 }
-
+// Calculate how many days from the current date to leaving date then use that number of days
 const processDate = async (date, coord) => {
     try {
         let leavingDate = Date.parse(date)
@@ -42,6 +43,7 @@ const processDate = async (date, coord) => {
     }    
 }
 
+// Get coordinate from Geonames using a location string name
 const fetchGeonames = async(location) => {
     try {
         let url = `${BASE_URL_GEONAMES}placename=${encodeURI(location)}&username=${process.env.GEONAMES_USER_NAME}&maxRows=1`
@@ -54,19 +56,19 @@ const fetchGeonames = async(location) => {
         console.log("Something is wrong in fetchGeonames",err)
     }
 }
-
+// Get weather data from Weatherbit using coordinate and number of day
 const fetchWeatherBit = async(coord, dayToGet) => {
     try {
         let url = `${BASE_URL_WEATHER_BIT}&lat=${coord.lat}&lon=${coord.lng}&days=${dayToGet}&key=${process.env.WEATHER_BIT_API_KEY}`
         let response = await fetch(url)
         let data = await response.json()
-        // console.log("Data: ", data.data[data.data.length - 1])
         return data.data[data.data.length - 1]
     } catch (err) {
         console.log("Something is wrong in fetchWeatherBit", err)
     }
 }
 
+// Get picture link from Pixabay using location String
 const fetchPixabay = async(location) => { 
     try {
         let url = `${BASE_URL_PIXABAY}key=${process.env.PIXABAY_API_KEY}&q=${location}&image_type=photo&category=travel`
@@ -94,20 +96,18 @@ app.get('/', function (req, res) {
 
 
 
-app.post('/get-travel-info', (req, res) => {
+app.post('/get-travel-info', async (req, res) => {
     let data = req.body
     let location = data.location
     let date = data.date
     console.log("Location received", location);
     console.log("Date received", date);
-    //TODO: Fix Promise All
+    // Make two fetching process run together to save time
     let promises = [fetchPixabay(location), getCoordThenWeather(location, date)]
-    Promise.all(promises)
-    .then(toClientData => {
-        console.log("toClientData", toClientData)
-        return JSON.stringify(toClientData)
-    })
-    .then((toClientData) => {res.send(toClientData)})
+    let toClientData = await Promise.all(promises)
+    console.log("toClientData: ", toClientData)
+    toClientData = JSON.stringify(toClientData)
+    res.send(toClientData)
     
 })
 // designates what port the app will listen to for incoming requests
